@@ -8,6 +8,19 @@ public class Hangman {
         System.out.println("HANGMAN");
     }
 
+    // Функція для створення підказки
+    public static String makeHint(String word) {
+        // беремо перші дві букви
+        String hint = word.substring(0, 2);
+
+        // решту замінюємо на дефіси
+        for (int i = 2; i < word.length(); i++) {
+            hint += "-";
+        }
+
+        return hint;
+    }
+
     // Функція для початку гри
     public static void startGame() {
         Scanner scanner = new Scanner(System.in);
@@ -19,7 +32,10 @@ public class Hangman {
         Random random = new Random();
         String secretWord = words[random.nextInt(words.length)];
 
-        System.out.print("Guess the word: > ");
+        // створюємо підказку
+        String hint = makeHint(secretWord);
+
+        System.out.print("Guess the word " + hint + ": > ");
         String guess = scanner.nextLine();
 
         if (guess.equals(secretWord)) {
@@ -35,7 +51,7 @@ public class Hangman {
         startGame();
     }
 
-    // Головна функція (точка входу)
+    // Головна функція
     public static void main(String[] args) {
         mainMenu();
     }
