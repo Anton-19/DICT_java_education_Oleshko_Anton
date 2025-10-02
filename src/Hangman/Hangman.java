@@ -37,38 +37,45 @@ public class Hangman {
             String input = scanner.nextLine();
 
             if (input.length() != 1) {
-                System.out.println("Please, input a single letter");
+                System.out.println("You should input a single letter");
+                System.out.println(new String(hiddenWord));
                 continue;
             }
 
             char guess = input.charAt(0);
 
-            if (usedLetters.contains(guess)) {
-                // Якщо буква вже була введена
-                System.out.println("No improvements");
-                lives--;
-            } else {
-                usedLetters.add(guess);
+            if (!(guess >= 'a' && guess <= 'z')) {
+                System.out.println("Please enter a lowercase English letter");
+                System.out.println(new String(hiddenWord));
+                continue;
+            }
 
-                if (secretWord.indexOf(guess) >= 0) {
-                    // якщо буква є у слові ми її відкриваємо розкриваємо
-                    for (int i = 0; i < secretWord.length(); i++) {
-                        if (secretWord.charAt(i) == guess) {
-                            hiddenWord[i] = guess;
-                        }
+            if (usedLetters.contains(guess)) {
+                System.out.println("You've already guessed this letter");
+                System.out.println(new String(hiddenWord));
+                continue;
+            }
+
+            usedLetters.add(guess);
+
+            if (secretWord.indexOf(guess) >= 0) {
+                // якщо буква є у слові ми її відкриваємо
+                for (int i = 0; i < secretWord.length(); i++) {
+                    if (secretWord.charAt(i) == guess) {
+                        hiddenWord[i] = guess;
                     }
-                } else {
-                    // Якщо букви немає
-                    System.out.println("That letter doesn't appear in the word");
-                    lives--;
                 }
+            } else {
+                // Якщо букви немає
+                System.out.println("That letter doesn't appear in the word");
+                lives--;
             }
 
             System.out.println(new String(hiddenWord));
 
             // перевірка на перемогу
             if (new String(hiddenWord).equals(secretWord)) {
-                System.out.println("You guessed the word!");
+                System.out.println("You guessed the word " + secretWord + "!");
                 System.out.println("You survived!");
                 return;
             }
