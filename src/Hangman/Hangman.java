@@ -28,7 +28,6 @@ public class Hangman {
 
         int lives = 8; // 8 помилок дозволено
 
-        printAnnouncement();
         System.out.println(new String(hiddenWord));
 
         // цикл гри
@@ -59,7 +58,7 @@ public class Hangman {
             usedLetters.add(guess);
 
             if (secretWord.indexOf(guess) >= 0) {
-                // якщо буква є у слові ми її відкриваємо
+                // якщо буква є у слові — розкриваємо
                 for (int i = 0; i < secretWord.length(); i++) {
                     if (secretWord.charAt(i) == guess) {
                         hiddenWord[i] = guess;
@@ -85,9 +84,22 @@ public class Hangman {
         System.out.println("You lost!");
     }
 
-    // Основне меню
     public static void mainMenu() {
-        startGame();
+        Scanner scanner = new Scanner(System.in);
+        printAnnouncement();
+
+        while (true) {
+            System.out.print("Type \"play\" to play the game, \"exit\" to quit: > ");
+            String choice = scanner.nextLine();
+
+            if (choice.equals("play")) {
+                startGame();
+            } else if (choice.equals("exit")) {
+                break;
+            } else {
+                continue;            // якщо некоректне введення — цикл повторюється
+            }
+        }
     }
 
     // Точка входу
