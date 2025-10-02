@@ -1,8 +1,8 @@
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Hangman {
 
+    // Вивід заголовку
     public static void printAnnouncement() {
         System.out.println("HANGMAN");
     }
@@ -14,28 +14,28 @@ public class Hangman {
         return words[random.nextInt(words.length)];
     }
 
-    // Головна логіка гри
+    // Основна логіка гри
     public static void startGame() {
         Scanner scanner = new Scanner(System.in);
         String secretWord = getRandomWord();
 
-        // створюємо масив символів для відображення (спочатку всі дефіси)
+        // приховане слово (спочатку дефіси)
         char[] hiddenWord = new char[secretWord.length()];
-        for (int i = 0; i < secretWord.length(); i++) {
-            hiddenWord[i] = '-';
-        }
+        Arrays.fill(hiddenWord, '-');
 
-        int attempts = 8; // кількість спроб
+        // набір уже використаних букв
+        Set<Character> usedLetters = new HashSet<>();
+
+        int lives = 8; // 8 помилок дозволено
 
         printAnnouncement();
         System.out.println(new String(hiddenWord));
 
         // цикл гри
-        while (attempts > 0) {
+        while (lives > 0) {
             System.out.print("Input a letter: > ");
             String input = scanner.nextLine();
 
-            // якщо ввели більше ніж 1 символ
             if (input.length() != 1) {
                 System.out.println("Please, input a single letter");
                 continue;
@@ -43,26 +43,39 @@ public class Hangman {
 
             char guess = input.charAt(0);
 
-            boolean found = false;
-            // перевіряємо, чи є буква у слові
-            for (int i = 0; i < secretWord.length(); i++) {
-                if (secretWord.charAt(i) == guess) {
-                    hiddenWord[i] = guess; // розкриваємо букву
-                    found = true;
-                }
-            }
+            if (usedLetters.contains(guess)) {
+                // Якщо буква вже була введена
+                System.out.println("No improvements");
+                lives--;
+            } else {
+                usedLetters.add(guess);
 
-            if (!found) {
-                System.out.println("That letter doesn't appear in the word"); //Цієї літери немає в слові
+                if (secretWord.indexOf(guess) >= 0) {
+                    // якщо буква є у слові ми її відкриваємо розкриваємо
+                    for (int i = 0; i < secretWord.length(); i++) {
+                        if (secretWord.charAt(i) == guess) {
+                            hiddenWord[i] = guess;
+                        }
+                    }
+                } else {
+                    // Якщо букви немає
+                    System.out.println("That letter doesn't appear in the word");
+                    lives--;
+                }
             }
 
             System.out.println(new String(hiddenWord));
 
-            attempts--; // після кожної спроби зменшуємо лічильник
+            // перевірка на перемогу
+            if (new String(hiddenWord).equals(secretWord)) {
+                System.out.println("You guessed the word!");
+                System.out.println("You survived!");
+                return;
+            }
         }
 
-        System.out.println("Thanks for playing!");
-        System.out.println("We'll see how well you did in the next stage");
+        // якщо спроби закінчились
+        System.out.println("You lost!");
     }
 
     // Основне меню
