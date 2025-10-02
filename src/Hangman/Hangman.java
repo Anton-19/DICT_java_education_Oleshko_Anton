@@ -3,55 +3,74 @@ import java.util.Scanner;
 
 public class Hangman {
 
-    // Функція для виводу вітального повідомлення
     public static void printAnnouncement() {
         System.out.println("HANGMAN");
     }
 
-    // Функція для створення підказки
-    public static String makeHint(String word) {
-        // беремо перші дві букви
-        String hint = word.substring(0, 2);
-
-        // решту замінюємо на дефіси
-        for (int i = 2; i < word.length(); i++) {
-            hint += "-";
-        }
-
-        return hint;
+    // Вибір випадкового слова
+    public static String getRandomWord() {
+        String[] words = {"python", "java", "javascript", "kotlin"};
+        Random random = new Random();
+        return words[random.nextInt(words.length)];
     }
 
-    // Функція для початку гри
+    // Головна логіка гри
     public static void startGame() {
         Scanner scanner = new Scanner(System.in);
+        String secretWord = getRandomWord();
 
-        // список можливих слів
-        String[] words = {"python", "java", "javascript", "kotlin"};
-
-        // вибираємо випадкове слово
-        Random random = new Random();
-        String secretWord = words[random.nextInt(words.length)];
-
-        // створюємо підказку
-        String hint = makeHint(secretWord);
-
-        System.out.print("Guess the word " + hint + ": > ");
-        String guess = scanner.nextLine();
-
-        if (guess.equals(secretWord)) {
-            System.out.println("You survived!");
-        } else {
-            System.out.println("You lost!");
+        // створюємо масив символів для відображення (спочатку всі дефіси)
+        char[] hiddenWord = new char[secretWord.length()];
+        for (int i = 0; i < secretWord.length(); i++) {
+            hiddenWord[i] = '-';
         }
+
+        int attempts = 8; // кількість спроб
+
+        printAnnouncement();
+        System.out.println(new String(hiddenWord));
+
+        // цикл гри
+        while (attempts > 0) {
+            System.out.print("Input a letter: > ");
+            String input = scanner.nextLine();
+
+            // якщо ввели більше ніж 1 символ
+            if (input.length() != 1) {
+                System.out.println("Please, input a single letter");
+                continue;
+            }
+
+            char guess = input.charAt(0);
+
+            boolean found = false;
+            // перевіряємо, чи є буква у слові
+            for (int i = 0; i < secretWord.length(); i++) {
+                if (secretWord.charAt(i) == guess) {
+                    hiddenWord[i] = guess; // розкриваємо букву
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                System.out.println("That letter doesn't appear in the word"); //Цієї літери немає в слові
+            }
+
+            System.out.println(new String(hiddenWord));
+
+            attempts--; // після кожної спроби зменшуємо лічильник
+        }
+
+        System.out.println("Thanks for playing!");
+        System.out.println("We'll see how well you did in the next stage");
     }
 
     // Основне меню
     public static void mainMenu() {
-        printAnnouncement();
         startGame();
     }
 
-    // Головна функція
+    // Точка входу
     public static void main(String[] args) {
         mainMenu();
     }
