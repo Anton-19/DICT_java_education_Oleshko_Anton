@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Hangman {
@@ -11,7 +12,13 @@ public class Hangman {
     public static void startGame() {
         Scanner scanner = new Scanner(System.in);
 
-        String secretWord = "java";              // заздалегідь встановлене слово
+        // список можливих слів
+        String[] words = {"python", "java", "javascript", "kotlin"};
+
+        // вибираємо випадкове слово
+        Random random = new Random();
+        String secretWord = words[random.nextInt(words.length)];
+
         System.out.print("Guess the word: > ");
         String guess = scanner.nextLine();
 
@@ -28,7 +35,7 @@ public class Hangman {
         startGame();
     }
 
-    // Головна функція
+    // Головна функція (точка входу)
     public static void main(String[] args) {
         mainMenu();
     }
