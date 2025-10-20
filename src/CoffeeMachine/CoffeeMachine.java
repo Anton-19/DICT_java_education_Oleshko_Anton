@@ -1,15 +1,14 @@
 package CoffeeMachine;
 
-import java.util.Scanner;
-
 public class CoffeeMachine {
     private int water;
     private int milk;
     private int beans;
     private int cups;
     private int money;
-    private String state = "chooseAction";
+    private String state = "chooseAction"; // поточний стан машини
 
+    // Початкові ресурси
     public CoffeeMachine() {
         this.water = 400;
         this.milk = 540;
@@ -18,6 +17,7 @@ public class CoffeeMachine {
         this.money = 550;
     }
 
+    // Метод, який обробляє введений рядок
     public void handleInput(String input) {
         switch (state) {
             case "chooseAction" -> chooseAction(input);
@@ -29,12 +29,12 @@ public class CoffeeMachine {
         }
     }
 
-    //  Вибір дії
+    // Вибір дії
     private void chooseAction(String input) {
         switch (input) {
             case "buy" -> {
                 state = "buy";
-                System.out.println("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back – to main menu:");
+                System.out.println("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
                 System.out.print("> ");
             }
             case "fill" -> {
@@ -58,7 +58,7 @@ public class CoffeeMachine {
         }
     }
 
-    //  Покупка кави
+    // Покупка кави
     private void processBuy(String input) {
         switch (input) {
             case "1" -> makeCoffee(250, 0, 16, 4);   // espresso
@@ -75,7 +75,7 @@ public class CoffeeMachine {
         printNextAction();
     }
 
-    //  Заповнення інгредієнтів
+    // Заповнення інгрідієнтів
     private void addWater(String input) {
         water += Integer.parseInt(input);
         state = "fillMilk";
@@ -103,7 +103,7 @@ public class CoffeeMachine {
         printNextAction();
     }
 
-    //  Приготування кави
+    // приготування кави
     private void makeCoffee(int needWater, int needMilk, int needBeans, int cost) {
         if (!hasEnough(needWater, needMilk, needBeans)) return;
 
@@ -132,7 +132,7 @@ public class CoffeeMachine {
         return true;
     }
 
-    //  Вивід залишків
+    // Вивід залишків
     private void printState() {
         System.out.println("\nThe coffee machine has:");
         System.out.println(water + " of water");
@@ -142,28 +142,14 @@ public class CoffeeMachine {
         System.out.println(money + " of money\n");
     }
 
-    //  Видача грошей
+    // Видача грошей
     private void takeMoney() {
         System.out.println("I gave you " + money);
         money = 0;
     }
 
-    // Вивід наступної дії
-    private void printNextAction() {
+    public void printNextAction() {
         System.out.println("Write action (buy, fill, take, remaining, exit):");
         System.out.print("> ");
-    }
-
-    // Головна
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        CoffeeMachine machine = new CoffeeMachine();
-
-        machine.printNextAction();
-
-        while (true) {
-            String input = scanner.nextLine().trim();
-            machine.handleInput(input);
-        }
     }
 }
