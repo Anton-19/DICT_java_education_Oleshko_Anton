@@ -1,46 +1,37 @@
 package MatrixProcessing;
 
+import java.util.Locale;
 import java.util.Scanner;
 
 public class MatrixProcessing {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        sc.useLocale(java.util.Locale.US);   // дозволяє замість коми вводити крапку в десяткових числах
+        sc.useLocale(Locale.US); // дозволяє вводити десяткові числа з крапкою
 
         while (true) {
-            // Меню
             System.out.println("1. Add matrices");
             System.out.println("2. Multiply matrix by a constant");
             System.out.println("3. Multiply matrices");
+            System.out.println("4. Transpose matrix");
             System.out.println("0. Exit");
             System.out.print("Your choice: > ");
 
             int choice = sc.nextInt();
-
-            if (choice == 0) {
-                break;
-            }
+            if (choice == 0) break;
 
             switch (choice) {
-                case 1:
-                    addMatrices(sc);
-                    break;
-                case 2:
-                    multiplyByConstant(sc);
-                    break;
-                case 3:
-                    multiplyMatrices(sc);
-                    break;
-                default:
-                    System.out.println("Invalid option. Try again.");
+                case 1 -> addMatrices(sc);
+                case 2 -> multiplyByConstant(sc);
+                case 3 -> multiplyMatrices(sc);
+                case 4 -> transposeMenu(sc);
+                default -> System.out.println("Invalid choice.\n");
             }
+            System.out.println();
         }
-
-        sc.close();
     }
 
-    // Додавання матриць
-    public static void addMatrices(Scanner sc) {
+    //  Додавання Матриць
+    private static void addMatrices(Scanner sc) {
         System.out.print("Enter size of first matrix: > ");
         int n1 = sc.nextInt();
         int m1 = sc.nextInt();
@@ -56,19 +47,17 @@ public class MatrixProcessing {
             return;
         }
 
-        double[][] sum = new double[n1][m1];
-        for (int i = 0; i < n1; i++) {
-            for (int j = 0; j < m1; j++) {
-                sum[i][j] = A[i][j] + B[i][j];
-            }
-        }
+        double[][] result = new double[n1][m1];
+        for (int i = 0; i < n1; i++)
+            for (int j = 0; j < m1; j++)
+                result[i][j] = A[i][j] + B[i][j];
 
         System.out.println("The result is:");
-        printMatrix(sum);
+        printMatrix(result);
     }
 
     // Множення на константу
-    public static void multiplyByConstant(Scanner sc) {
+    private static void multiplyByConstant(Scanner sc) {
         System.out.print("Enter size of matrix: > ");
         int n = sc.nextInt();
         int m = sc.nextInt();
@@ -77,19 +66,16 @@ public class MatrixProcessing {
         System.out.print("Enter constant: > ");
         double k = sc.nextDouble();
 
-        double[][] result = new double[n][m];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                result[i][j] = matrix[i][j] * k;
-            }
-        }
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                matrix[i][j] *= k;
 
         System.out.println("The result is:");
-        printMatrix(result);
+        printMatrix(matrix);
     }
 
     //  Множення матриць
-    public static void multiplyMatrices(Scanner sc) {
+    private static void multiplyMatrices(Scanner sc) {
         System.out.print("Enter size of first matrix: > ");
         int n1 = sc.nextInt();
         int m1 = sc.nextInt();
@@ -100,21 +86,17 @@ public class MatrixProcessing {
         int m2 = sc.nextInt();
         double[][] B = readMatrix(sc, n2, m2, "second");
 
-        // Перевірка на можливість множення
         if (m1 != n2) {
             System.out.println("The operation cannot be performed.");
             return;
         }
 
         double[][] result = new double[n1][m2];
-
         for (int i = 0; i < n1; i++) {
             for (int j = 0; j < m2; j++) {
-                double sum = 0;
                 for (int k = 0; k < m1; k++) {
-                    sum += A[i][k] * B[k][j];
+                    result[i][j] += A[i][k] * B[k][j];
                 }
-                result[i][j] = sum;
             }
         }
 
@@ -122,13 +104,40 @@ public class MatrixProcessing {
         printMatrix(result);
     }
 
-    //  Допоміжні методи
-    private static double[][] readMatrix(Scanner sc, int n, int m, String name) {
-        if (!name.isEmpty()) {
-            System.out.println("Enter " + name + " matrix:");
-        } else {
-            System.out.println("Enter matrix:");
+    // Транспонування
+    private static void transposeMenu(Scanner sc) {
+        System.out.println("1. Main diagonal");
+        System.out.println("2. Side diagonal");
+        System.out.println("3. Vertical line");
+        System.out.println("4. Horizontal line");
+        System.out.print("Your choice: > ");
+        int t = sc.nextInt();
+
+        System.out.print("Enter matrix size: > ");
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        double[][] matrix = readMatrix(sc, n, m, "");
+
+        double[][] result;
+        switch (t) {
+            case 1 -> result = transposeMain(matrix);
+            case 2 -> result = transposeSide(matrix);
+            case 3 -> result = transposeVertical(matrix);
+            case 4 -> result = transposeHorizontal(matrix);
+            default -> {
+                System.out.println("Invalid choice.");
+                return;
+            }
         }
+
+        System.out.println("The result is:");
+        printMatrix(result);
+    }
+
+    //  Допоміжні функції
+    private static double[][] readMatrix(Scanner sc, int n, int m, String name) {
+        if (!name.isEmpty()) System.out.println("Enter " + name + " matrix:");
+        else System.out.println("Enter matrix:");
         double[][] matrix = new double[n][m];
         for (int i = 0; i < n; i++) {
             System.out.print("> ");
@@ -141,16 +150,46 @@ public class MatrixProcessing {
 
     private static void printMatrix(double[][] matrix) {
         for (double[] row : matrix) {
-            for (int j = 0; j < row.length; j++) {
-                // Виводимо без зайвих нулів після коми (1.0 → 1)
-                if (row[j] == (int) row[j]) {
-                    System.out.print((int) row[j]);
-                } else {
-                    System.out.print(row[j]);
-                }
-                if (j < row.length - 1) System.out.print(" ");
-            }
+            for (double x : row)
+                System.out.print((x == (int) x ? (int) x : x) + " ");
             System.out.println();
         }
+    }
+
+    //  види транспонування
+    private static double[][] transposeMain(double[][] a) {
+        int n = a.length, m = a[0].length;
+        double[][] t = new double[m][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                t[j][i] = a[i][j];
+        return t;
+    }
+
+    private static double[][] transposeSide(double[][] a) {
+        int n = a.length, m = a[0].length;
+        double[][] t = new double[m][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                t[m - 1 - j][n - 1 - i] = a[i][j];
+        return t;
+    }
+
+    private static double[][] transposeVertical(double[][] a) {
+        int n = a.length, m = a[0].length;
+        double[][] t = new double[n][m];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                t[i][m - 1 - j] = a[i][j];
+        return t;
+    }
+
+    private static double[][] transposeHorizontal(double[][] a) {
+        int n = a.length, m = a[0].length;
+        double[][] t = new double[n][m];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                t[n - 1 - i][j] = a[i][j];
+        return t;
     }
 }
