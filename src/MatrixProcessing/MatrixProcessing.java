@@ -7,47 +7,32 @@ public class MatrixProcessing {
         Scanner sc = new Scanner(System.in);
 
         System.out.print("> ");
-        int n1 = sc.nextInt();
-        int m1 = sc.nextInt();
+        int n = sc.nextInt();
+        int m = sc.nextInt();
 
-        int[][] A = new int[n1][m1];
+        int[][] matrix = new int[n][m];
 
-        for (int i = 0; i < n1; i++) {
+        for (int i = 0; i < n; i++) {
             System.out.print("> ");
-            for (int j = 0; j < m1; j++) {
-                A[i][j] = sc.nextInt();
+            for (int j = 0; j < m; j++) {
+                matrix[i][j] = sc.nextInt();
             }
         }
 
         System.out.print("> ");
-        int n2 = sc.nextInt();
-        int m2 = sc.nextInt();
+        int k = sc.nextInt();
 
-        int[][] B = new int[n2][m2];
-
-        for (int i = 0; i < n2; i++) {
-            System.out.print("> ");
-            for (int j = 0; j < m2; j++) {
-                B[i][j] = sc.nextInt();
+        int[][] result = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result[i][j] = matrix[i][j] * k;
             }
         }
 
-        if (n1 != n2 || m1 != m2) {
-            System.out.println("ERROR");
-            return;
-        }
-
-        int[][] sum = new int[n1][m1];
-        for (int i = 0; i < n1; i++) {
-            for (int j = 0; j < m1; j++) {
-                sum[i][j] = A[i][j] + B[i][j];
-            }
-        }
-
-        for (int i = 0; i < n1; i++) {
-            for (int j = 0; j < m1; j++) {
-                System.out.print(sum[i][j]);
-                if (j < m1 - 1) System.out.print(" ");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                System.out.print(result[i][j]);
+                if (j < m - 1) System.out.print(" ");
             }
             System.out.println();
         }
