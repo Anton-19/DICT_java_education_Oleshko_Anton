@@ -1,26 +1,39 @@
 package RockPaperScissors;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 
 public class RockPaperScissors {
 
-    private static final String[] OPTIONS = {"rock", "paper", "scissors"};
     private static final Random random = new Random();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        //Зчитування імені користувача
+        // Ім'я користувача
         System.out.print("Enter your name: > ");
         String name = scanner.nextLine();
         System.out.println("Hello, " + name);
 
-        //Завантаження рейтингу користувача
-        int rating = loadRating(name);
+        System.out.print("> ");
 
-        //Основний ігровий цикл
+        // Завантаження рейтингу
+        int rating = loadRating(name);
+        Map<String, Integer> ratings = loadAllRatings(); // Зберігаємо все, щоб потім оновити файл
+
+        // вибір опцій
+        String inputOptions = scanner.nextLine().trim();
+        List<String> options;
+        if (inputOptions.isEmpty()) {
+            options = Arrays.asList("rock", "paper", "scissors");
+        } else {
+            options = Arrays.asList(inputOptions.split(","));
+            options.replaceAll(String::trim);
+        }
+
+        System.out.println("Okay, let's start");
+
+        //Ігровий цикл
         while (true) {
             System.out.print("> ");
             String userChoice = scanner.nextLine().toLowerCase();
@@ -31,18 +44,17 @@ public class RockPaperScissors {
             } else if (userChoice.equals("!rating")) {
                 System.out.println("Your rating: " + rating);
                 continue;
-            } else if (!isValidOption(userChoice)) {
+            } else if (!options.contains(userChoice)) {
                 System.out.println("Invalid input");
                 continue;
             }
 
-            // Хід комп'ютера
-            String computerChoice = OPTIONS[random.nextInt(OPTIONS.length)];
+            // Хід комп’ютера
+            String computerChoice = options.get(random.nextInt(options.size()));
 
             // Визначення результату
-            String result = getResult(userChoice, computerChoice);
+            String result = getResult(userChoice, computerChoice, options);
 
-            // Виведення результату гри
             switch (result) {
                 case "win":
                     System.out.println("Well done. The computer chose " + computerChoice + " and failed");
@@ -57,46 +69,67 @@ public class RockPaperScissors {
                     break;
             }
         }
+
+        // Оновлення рейтингу у файлі після виходу
+        ratings.put(name, rating);
+        saveRatings(ratings);
     }
 
-    // Метод для перевірки, чи введено коректну опцію
-    private static boolean isValidOption(String input) {
-        for (String option : OPTIONS) {
-            if (option.equals(input)) return true;
-        }
-        return false;
-    }
 
-    // Метод для визначення результату гри
-    private static String getResult(String user, String computer) {
+    // Алгоритм визначення переможця
+    private static String getResult(String user, String computer, List<String> options) {
         if (user.equals(computer)) return "draw";
 
-        if ((user.equals("rock") && computer.equals("scissors")) ||
-                (user.equals("scissors") && computer.equals("paper")) ||
-                (user.equals("paper") && computer.equals("rock"))) {
-            return "win";
-        }
-        return "lose";
+        int userIndex = options.indexOf(user);
+        List<String> reordered = new ArrayList<>();
+
+        reordered.addAll(options.subList(userIndex + 1, options.size()));
+        reordered.addAll(options.subList(0, userIndex));
+
+        int half = reordered.size() / 2;
+        List<String> beatsUser = reordered.subList(0, half); // хто б'є користувача
+
+        if (beatsUser.contains(computer)) return "lose";
+        else return "win";
     }
 
-    // Метод для завантаження рейтингу користувача з файлу
+    // Зчитати рейтинг для конкретного користувача
     private static int loadRating(String name) {
-        int rating = 0;
+        File file = new File("rating.txt");
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNext()) {
+                String player = scanner.next();
+                int score = scanner.nextInt();
+                if (player.equals(name)) return score;
+            }
+        } catch (FileNotFoundException ignored) {}
+        return 0;
+    }
+
+    // Зчитати всі рейтинги
+    private static Map<String, Integer> loadAllRatings() {
+        Map<String, Integer> ratings = new HashMap<>();
         File file = new File("rating.txt");
 
-        try (Scanner fileScanner = new Scanner(file)) {
-            while (fileScanner.hasNext()) {
-                String player = fileScanner.next();
-                int score = fileScanner.nextInt();
-                if (player.equals(name)) {
-                    rating = score;
-                    break;
-                }
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNext()) {
+                String player = scanner.next();
+                int score = scanner.nextInt();
+                ratings.put(player, score);
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {}
 
+        return ratings;
+    }
+
+    // Зберегти всі рейтинги назад у файл
+    private static void saveRatings(Map<String, Integer> ratings) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("rating.txt"))) {
+            for (Map.Entry<String, Integer> entry : ratings.entrySet()) {
+                writer.println(entry.getKey() + " " + entry.getValue());
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving ratings.");
         }
-
-        return rating;
     }
 }
