@@ -6,14 +6,25 @@ public class CurrencyExchange {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Please, enter the number of mycoins you have: > ");
+        // Зчитуємо кількість mycoins
+        System.out.print("> ");
         double mycoins = scanner.nextDouble();
 
-        System.out.print("Please, enter the exchange rate: > ");
-        double rate = scanner.nextDouble();
+        double rateARS = 0.82;      // аргентинське песо
+        double rateHNL = 0.17;      // гондураська лемпіра
+        double rateAUD = 1.9622;    // австралійський долар
+        double rateMAD = 0.208;     // марокканський дирхам
 
-        double dollars = mycoins * rate;
+        // Обчислюємо значення
+        double ars = mycoins * rateARS;
+        double hnl = mycoins * rateHNL;
+        double aud = mycoins * rateAUD;
+        double mad = mycoins * rateMAD;
 
-        System.out.println("The total amount of dollars: " + dollars);
+        // Виводимо результат з округленням до 2 знаків
+        System.out.println(String.format("I will get %.2f ARS from the sale of %.1f mycoins.", ars, mycoins));
+        System.out.println(String.format("I will get %.2f HNL from the sale of %.1f mycoins.", hnl, mycoins));
+        System.out.println(String.format("I will get %.2f AUD from the sale of %.1f mycoins.", aud, mycoins));
+        System.out.println(String.format("I will get %.2f MAD from the sale of %.1f mycoins.", mad, mycoins));
     }
 }
