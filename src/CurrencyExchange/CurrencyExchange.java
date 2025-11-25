@@ -1,30 +1,56 @@
 package CurrencyExchange;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Scanner;
+import org.json.JSONObject;
 
 public class CurrencyExchange {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Зчитуємо кількість mycoins
-        System.out.print("> ");
-        double mycoins = scanner.nextDouble();
+        // Запитуємо код валюти
+        System.out.print("Enter your currency code (example: AUD, UAH, PLN): ");
+        String baseCurrency = scanner.nextLine().trim().toLowerCase();
 
-        double rateARS = 0.82;      // аргентинське песо
-        double rateHNL = 0.17;      // гондураська лемпіра
-        double rateAUD = 1.9622;    // австралійський долар
-        double rateMAD = 0.208;     // марокканський дирхам
+        try {
+            // Формуємо URL та робимо HTTP-запит
+            String url = "http://www.floatrates.com/daily/" + baseCurrency + ".json";
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .build();
 
-        // Обчислюємо значення
-        double ars = mycoins * rateARS;
-        double hnl = mycoins * rateHNL;
-        double aud = mycoins * rateAUD;
-        double mad = mycoins * rateMAD;
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Виводимо результат з округленням до 2 знаків
-        System.out.println(String.format("I will get %.2f ARS from the sale of %.1f mycoins.", ars, mycoins));
-        System.out.println(String.format("I will get %.2f HNL from the sale of %.1f mycoins.", hnl, mycoins));
-        System.out.println(String.format("I will get %.2f AUD from the sale of %.1f mycoins.", aud, mycoins));
-        System.out.println(String.format("I will get %.2f MAD from the sale of %.1f mycoins.", mad, mycoins));
+            if (response.statusCode() != 200) {
+                System.out.println("Error: HTTP status " + response.statusCode());
+                return;
+            }
+
+            //  Парсимо JSON
+            JSONObject json = new JSONObject(response.body());
+
+            //  Виводимо курси USD та EUR
+            if (json.has("usd")) {
+                JSONObject usd = json.getJSONObject("usd");
+                System.out.println("USD exchange rate: " + usd.getDouble("rate"));
+            } else {
+                System.out.println("USD exchange rate not available for this currency.");
+            }
+
+            if (json.has("eur")) {
+                JSONObject eur = json.getJSONObject("eur");
+                System.out.println("EUR exchange rate: " + eur.getDouble("rate"));
+            } else {
+                System.out.println("EUR exchange rate not available for this currency.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: Unable to load currency data.");
+            e.printStackTrace();
+        }
     }
 }
