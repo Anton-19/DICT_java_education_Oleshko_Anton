@@ -1,56 +1,28 @@
 package CurrencyExchange;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Scanner;
-import org.json.JSONObject;
 
 public class CurrencyExchange {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Запитуємо код валюти
-        System.out.print("Enter your currency code (example: AUD, UAH, PLN): ");
-        String baseCurrency = scanner.nextLine().trim().toLowerCase();
+        System.out.print("Enter base currency code: ");
+        String baseCurrency = scanner.nextLine().trim();
 
-        try {
-            // Формуємо URL та робимо HTTP-запит
-            String url = "http://www.floatrates.com/daily/" + baseCurrency + ".json";
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .build();
+        ICurrencyConverter converter = new CurrencyConverter(baseCurrency);
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        while (true) {
+            System.out.print("Enter target currency code (or empty to exit): ");
+            String targetCurrency = scanner.nextLine().trim();
+            if (targetCurrency.isEmpty()) break;
 
-            if (response.statusCode() != 200) {
-                System.out.println("Error: HTTP status " + response.statusCode());
-                return;
-            }
+            System.out.print("Enter amount: ");
+            double amount = Double.parseDouble(scanner.nextLine());
 
-            //  Парсимо JSON
-            JSONObject json = new JSONObject(response.body());
-
-            //  Виводимо курси USD та EUR
-            if (json.has("usd")) {
-                JSONObject usd = json.getJSONObject("usd");
-                System.out.println("USD exchange rate: " + usd.getDouble("rate"));
-            } else {
-                System.out.println("USD exchange rate not available for this currency.");
-            }
-
-            if (json.has("eur")) {
-                JSONObject eur = json.getJSONObject("eur");
-                System.out.println("EUR exchange rate: " + eur.getDouble("rate"));
-            } else {
-                System.out.println("EUR exchange rate not available for this currency.");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error: Unable to load currency data.");
-            e.printStackTrace();
+            double exchanged = converter.convert(targetCurrency, amount);
+            System.out.printf("You received %.2f %s.%n", exchanged, targetCurrency.toUpperCase());
         }
+
+        System.out.println("Program finished.");
     }
 }
